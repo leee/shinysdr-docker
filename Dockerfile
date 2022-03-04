@@ -4,8 +4,8 @@
 FROM ubuntu:20.04
 
 # git vs git-all
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && apt-get install -y \
     build-essential \
     # git-all \
     git \
@@ -24,7 +24,18 @@ RUN apt-get update && \
     wsjtx \
     multimon-ng \
     rtl-433 \
-    python3-setuptools
+    # libasound2 \
+    # libasound2-dev \
+    # alsa-base \
+    alsa-utils \
+    # portaudio19-dev \
+    # pulseaudio-utils \
+    python3-setuptools \
+    dbus \
+    avahi-daemon \
+    sudo \
+    && \
+    apt autoclean
 
 WORKDIR /tmp
 
@@ -36,7 +47,8 @@ RUN mkdir gr-dsd && cd gr-dsd && git init && \
     \
     mkdir build && cd build && \
     cmake -DCMAKE_INSTALL_PREFIX=/usr .. && \
-    make && make install && ldconfig
+    make && make install && ldconfig && \
+    cd ../.. && rm -rf gr-dsd
 
 # Install gr-radioteletype at last gr3.8 compat
 RUN DEBIAN_FRONTEND=noninteractive && \
@@ -47,13 +59,33 @@ RUN DEBIAN_FRONTEND=noninteractive && \
     \
     mkdir build && cd build && \
     cmake -DCMAKE_INSTALL_PREFIX=/usr .. && \
-    make && make install && ldconfig
+    make && make install && ldconfig && \
+    cd ../.. && rm -rf gr-radioteletype
 
 # Install ShinySDR fork
 RUN git clone --depth 1 https://github.com/w1xm/shinysdr && \
     cd shinysdr && \
     \
     python3 setup.py build && \
-    python3 setup.py install --force
+    python3 setup.py install --force && \
+    cd .. && rm -rf shinysdr
 
-RUN apt-get clean && apt autoclean -y
+# shinysdr won't run as root
+# RUN adduser --system --group --gecos "" --disabled-password shinysdr && \
+RUN adduser --gecos "" --disabled-password shinysdr && \
+    adduser shinysdr sudo && \
+    echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+USER shinysdr
+
+# alsa quirk
+RUN echo "pcm.!default = null;" >> ~/.asoundrc
+
+# gnuradio quirk
+# ENV HOME=/tmp
+
+COPY --chown=shinysdr: shinysdr.sh shinysdr.sh
+
+RUN chmod +x shinysdr.sh
+
+ENTRYPOINT ["./shinysdr.sh"]
+CMD ["/app"]
