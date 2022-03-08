@@ -25,3 +25,7 @@ docker run --interactive --tty \
 ## Assumptions
 
 We use the [W1MX/W1XM fork of ShinySDR](https://github.com/w1xm/shinysdr). We also install specific versions of `gr-dsd` and `gr-radioteletype` that were last known compatible with `gnuradio 3.8`.
+
+## TODO
+
+- Images are 2GB. Figure out how to make multi-stage builds where you make in a build image and make install into a lightweight prod image.

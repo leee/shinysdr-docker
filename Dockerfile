@@ -1,13 +1,8 @@
-# TODO: take advantage of multi-stage builds:
-# do makes in a build image, make install into prod image
-
 FROM ubuntu:20.04
 
-# git vs git-all
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && apt-get install -y \
     build-essential \
-    # git-all \
     git \
     cmake \
     gnuradio \
@@ -24,12 +19,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     wsjtx \
     multimon-ng \
     rtl-433 \
-    # libasound2 \
-    # libasound2-dev \
-    # alsa-base \
     alsa-utils \
-    # portaudio19-dev \
-    # pulseaudio-utils \
     python3-setuptools \
     dbus \
     avahi-daemon \
@@ -70,10 +60,7 @@ RUN git clone --depth 1 https://github.com/w1xm/shinysdr && \
     cd .. && rm -rf shinysdr
 
 # shinysdr won't run as root
-# RUN adduser --system --group --gecos "" --disabled-password shinysdr && \
 RUN adduser --gecos "" --disabled-password shinysdr
-#    adduser shinysdr sudo && \
-#    echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # alsa quirk
 RUN su - shinysdr -c "echo 'pcm.!default = null;' >> ~/.asoundrc"
