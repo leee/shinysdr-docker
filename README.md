@@ -22,6 +22,10 @@ docker run --interactive --tty \
 
 - `--volume`: ShinySDR uses directories for configuration. If you don't already have a config directory, you should map a config directory as a volume, even if it's empty. This image will check for directory emptiness on runtime, and invoke `shinysdr --create` to create a new default config.
 
+## ShinySDR Manual
+
+For all non-Docker ShinySDR-related questions including ShinySDR configuration, please peruse the [ShinySDR website](https://shinysdr.switchb.org/) and [ShinySDR Manual](https://shinysdr.switchb.org/manual/).
+
 ## Assumptions
 
 We use the [W1MX/W1XM fork of ShinySDR](https://github.com/w1xm/shinysdr). We also install specific versions of `gr-dsd` and `gr-radioteletype` that were last known compatible with `gnuradio 3.8`.
