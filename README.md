@@ -5,7 +5,10 @@
 To build locally: `sudo docker build --tag shinysdr .`
 
 ```
-sudo docker run --privileged --interactive --tty --publish 8100-8101:8100-8101/tcp --volume /canonical/path/to/config/dir/on/host:/app shinysdr
+sudo docker run --privileged --interactive --tty \
+    --publish 8100-8101:8100-8101/tcp \
+    --volume /canonical/path/to/config/dir/on/host:/app \
+    shinysdr
 ```
 
 ### Run Explanations:
