@@ -33,7 +33,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     python3-setuptools \
     dbus \
     avahi-daemon \
-    sudo \
     && \
     apt autoclean
 
@@ -72,20 +71,22 @@ RUN git clone --depth 1 https://github.com/w1xm/shinysdr && \
 
 # shinysdr won't run as root
 # RUN adduser --system --group --gecos "" --disabled-password shinysdr && \
-RUN adduser --gecos "" --disabled-password shinysdr && \
-    adduser shinysdr sudo && \
-    echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-USER shinysdr
+RUN adduser --gecos "" --disabled-password shinysdr
+#    adduser shinysdr sudo && \
+#    echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # alsa quirk
-RUN echo "pcm.!default = null;" >> ~/.asoundrc
+RUN su - shinysdr -c "echo 'pcm.!default = null;' >> ~/.asoundrc"
 
 # gnuradio quirk
 # ENV HOME=/tmp
 
-COPY --chown=shinysdr: shinysdr.sh shinysdr.sh
+COPY --chown=shinysdr:shinysdr shinysdr.sh shinysdr.sh
 
 RUN chmod +x shinysdr.sh
+
+EXPOSE 8100/tcp
+EXPOSE 8101/tcp
 
 ENTRYPOINT ["./shinysdr.sh"]
 CMD ["/app"]
